@@ -1,4 +1,4 @@
-# Anna's DE + DS + Agentic AI Study Journey
+# Andrina's DE + DS + Agentic AI Study Journal
 
 **Started:** May 1, 2026
 **Goal:** Senior Data Engineer / Data Scientist at FAANG by 2027
