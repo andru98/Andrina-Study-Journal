@@ -1,0 +1,83 @@
+# SQL Daily Practice
+
+Daily SQL problem solving — 2 problems every morning,
+no exceptions. Part of an 8-month structured Data
+Engineering upskilling program.
+
+**Background:** Experience in airline revenue management
+analytics. Applying SQL concepts directly to pricing,
+demand forecasting, and booking data use cases.
+
+---
+
+## Structure
+
+```
+sql-practice/
+├── leetcode/
+│   ├── easy/       — filter, joins, aggregation
+│   ├── medium/     — window functions, CTEs, subqueries
+│   └── hard/       — complex joins, recursive CTEs
+└── datalemur/
+    ├── easy/
+    └── medium/
+```
+
+---
+
+## Progress
+
+| Month | Problems Solved | Key Concepts |
+|-------|----------------|--------------|
+| May   | 0              | Starting     |
+| Jun   | 0              |              |
+| Jul   | 0              |              |
+| Aug   | 0              |              |
+
+**Running total: 0 / 175 target by Dec 2026**
+
+---
+
+## Concepts Covered
+
+- [ ] WHERE + NULL handling
+- [ ] JOINs — inner, left, right, self
+- [ ] GROUP BY + HAVING
+- [ ] Window functions — ROW_NUMBER, RANK, DENSE_RANK
+- [ ] Window functions — LAG, LEAD, SUM OVER, AVG OVER
+- [ ] CTEs
+- [ ] Subqueries
+- [ ] Query optimization + execution plans
+- [ ] Warehouse performance tuning
+
+---
+
+## Solution Template
+
+Every `.sql` file follows this format:
+
+```sql
+-- Problem: [name]
+-- Source: LeetCode #[number] / DataLemur
+-- Difficulty: Easy / Medium / Hard
+-- Pattern: [window function / CTE / join etc]
+-- Date: YYYY-MM-DD
+-- Time taken: X minutes
+
+[solution here]
+
+-- Learning: [what clicked]
+-- Real world: [airline or health data connection]
+```
+
+---
+
+## Platforms
+
+- LeetCode: https://leetcode.com
+- DataLemur: https://datalemur.com
+
+## Connect
+
+- LinkedIn: www.linkedin.com/in/andrina-data
+- Study tracker: See Study_Progress_Tracker.xlsx
