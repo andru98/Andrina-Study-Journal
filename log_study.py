@@ -13,8 +13,8 @@ from datetime import datetime
 from pathlib import Path
 
 # ── CONFIG — update these paths ──────────────────────────────
-EXCEL_PATH = Path.home() / "anna-study-journey" / "Study_Progress_Tracker.xlsx"
-REPO_PATH  = Path.home() / "anna-study-journey"
+EXCEL_PATH = Path.home() / "Desktop" / "anna-study-journey" / "Study_Progress_Tracker.xlsx"
+REPO_PATH  = Path.home() / "Desktop" / "anna-study-journey"
 # ─────────────────────────────────────────────────────────────
 
 def parse_log(text):
