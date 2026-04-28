@@ -43,7 +43,7 @@ def parse_log(text):
     elif 'ds' in text or 'data science' in text or 'ml' in text:
         track = 'DS'
 
-    # Topics — extract sentence after "topics:" or just use raw
+    # Topics
     topics = ''
     for pattern in [r'topics?[:\s]+([^,\n]+)', r'studied[:\s]+([^,\n]+)']:
         m = re.search(pattern, text)
@@ -51,7 +51,6 @@ def parse_log(text):
             topics = m.group(1).strip()
             break
     if not topics:
-        # grab everything before "hours" as topic hint
         m = re.search(r'log[^:]*:(.*?)(?:hours?|$)', text)
         if m:
             topics = m.group(1).strip()[:100]
@@ -166,7 +165,7 @@ def git_commit(data):
 
 
 def evaluate_progress(data):
-    """Give Claude-style progress feedback."""
+    """Give progress feedback based on 6-8 hour daily target."""
     print("\n" + "="*55)
     print("  PROGRESS EVALUATION")
     print("="*55)
@@ -174,57 +173,82 @@ def evaluate_progress(data):
     warnings = []
     positives = []
 
-    if data['hours'] >= 8:
-        positives.append(f"Full 8 hours studied")
-    elif data['hours'] >= 6:
-        warnings.append(f"Only {data['hours']} hrs — target is 8")
+    # ── Hours — target is 6-8 hrs per day ──────────────────
+    if data['hours'] >= 6:
+        positives.append(f"{data['hours']} hrs studied — on target")
+    elif data['hours'] >= 4:
+        warnings.append(f"{data['hours']} hrs — target is 6-8 hrs per day")
+    elif data['hours'] >= 2:
+        warnings.append(f"Only {data['hours']} hrs — significantly below 6hr target")
     else:
-        warnings.append(f"Only {data['hours']} hrs — significantly below target")
+        warnings.append(f"Only {data['hours']} hrs — needs urgent attention tomorrow")
 
+    # ── SQL ─────────────────────────────────────────────────
     if data['sql'] >= 2:
-        positives.append(f"{data['sql']} SQL problems solved — daily habit maintained")
+        positives.append(f"{data['sql']} SQL problems — daily habit maintained")
     elif data['sql'] == 1:
-        warnings.append("Only 1 SQL problem — target is 2 minimum")
+        warnings.append("Only 1 SQL problem — target is 2 minimum every day")
     else:
-        warnings.append("No SQL problems today — daily habit broken")
+        warnings.append("No SQL problems today — daily habit broken, do 4 tomorrow")
 
+    # ── GitHub ──────────────────────────────────────────────
     if data['github'] == 'Yes':
-        positives.append("GitHub committed — streak maintained")
+        positives.append("GitHub committed — green square earned")
     else:
-        warnings.append("No GitHub commit — push something today")
+        warnings.append("No GitHub commit — push something before midnight")
 
+    # ── Krish Naik ──────────────────────────────────────────
     if data['krish'] == 'Yes':
-        positives.append("Krish Naik session attended")
+        positives.append("Krish Naik session watched + recoded")
+    elif data['krish'] == 'No':
+        warnings.append("No Krish Naik today — stay on catch-up schedule")
 
+    # ── Print results ────────────────────────────────────────
     for p in positives:
-        print(f"  ✓ {p}")
+        print(f"  + {p}")
     for w in warnings:
-        print(f"  ⚠ {w}")
+        print(f"  ! {w}")
 
+    # ── Overall verdict ──────────────────────────────────────
+    print()
     if not warnings:
-        print("\n  Perfect day Anna. Keep this up.")
+        print("  Perfect day Anna. This is what 8 months of")
+        print("  consistency looks like. Keep this up.")
     elif len(warnings) == 1:
-        print(f"\n  Good day overall. Fix: {warnings[0]}")
+        print(f"  Strong day overall. One thing to fix:")
+        print(f"  {warnings[0]}")
+    elif len(warnings) == 2:
+        print(f"  Decent day. Two things to tighten tomorrow.")
     else:
-        print(f"\n  {len(warnings)} things to improve tomorrow.")
+        print(f"  Below target today. Tomorrow:")
+        print(f"  Start with SQL first thing. No exceptions.")
 
+    # ── Stuck on hint ────────────────────────────────────────
     if data['stuck']:
-        print(f"\n  Stuck on: {data['stuck']}")
-        print("  → Ask Claude Code: 'explain [topic] with a simple analogy and code example'")
+        print()
+        print(f"  Stuck on: {data['stuck']}")
+        print("  Ask Claude: 'explain [topic] with a biochemistry")
+        print("  analogy and a code example under 20 lines'")
 
+    # ── Hours milestone ──────────────────────────────────────
+    print()
+    print(f"  At 6 hrs/day — you finish 8 months in Dec 2026.")
+    print(f"  At 4 hrs/day — you need to extend to Feb 2027.")
+    print(f"  Today: {data['hours']} hrs.")
     print("="*55)
 
 
 def main():
     print("\n" + "="*55)
     print("  ANNA'S DAILY STUDY LOG")
+    print("  Target: 6-8 hrs/day · 2 SQL · 1 GitHub commit")
     print("="*55)
     print("\nPaste your log below (press Enter twice when done):\n")
     print("Example:")
-    print("  May 1, Month 1, DE, window functions ROW_NUMBER RANK,")
-    print("  8 hours, 2 SQL problems, GitHub yes, Krish no,")
-    print("  PyCharm yes, stuck on DENSE_RANK,")
-    print("  insight PARTITION BY keeps rows unlike GROUP BY")
+    print("  May 1, Month 1, DE, pandas groupby merge pivot,")
+    print("  6 hours, 2 SQL, GitHub yes, Krish yes,")
+    print("  PyCharm yes, stuck on merge vs join,")
+    print("  insight groupby in pandas is same as GROUP BY in SQL")
     print()
 
     lines = []
@@ -273,7 +297,7 @@ def main():
         evaluate_progress(data)
         print("\nDone. See you tomorrow Anna.\n")
     else:
-        print("Excel write failed — check the file path in the script.")
+        print("Excel write failed — check file path in script config.")
 
 
 if __name__ == '__main__':
