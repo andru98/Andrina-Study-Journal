@@ -20,7 +20,9 @@ WEEKDAY_ALARMS = [
      "Market is open. Execute your plan. Stick to your rules."),
     ("09:30", "Trading Session END",
      "Close all positions now. No exceptions. Fill your trading journal."),
-    ("09:45", "Study Block 1",
+    ("09:45", "SQL Practice",
+     "SQL time. Two DataLemur problems. 30 minutes."),
+    ("10:15", "Study Block 1",
      "Deep study begins. Main topic for this week. 2 hours of full focus."),
     ("11:45", "Short Break",
      "15 minute break. Step away from the screen. Rest your eyes."),
@@ -32,12 +34,10 @@ WEEKDAY_ALARMS = [
      "15 minute break. Stretch and move your body."),
     ("15:15", "DSA Practice",
      "DSA time. One concept and two LeetCode problems. One hour."),
-    ("16:15", "SQL Practice",
-     "SQL time. Two DataLemur problems. 30 minutes."),
     ("16:45", "End of Day",
      "Study complete. Run studylog. Update Excel. Commit to GitHub."),
-    ("17:15", "Done",
-     "Well done Andrina. Rest now. See you tomorrow at 7:30."),
+    ("16:45", "End of Day",
+ "Study complete. Run: python3 log_study.py — then commit notebooks to GitHub. Done for today."),
 ]
 
 WEEKEND_ALARMS = [
@@ -65,9 +65,9 @@ WEEKEND_ALARMS = [
      "Well done Andrina. Rest now."),
 ]
 
-SUNDAY_EXTRA = [
+SATURDAY_EXTRA = [
     ("17:30", "Weekly Review",
-     "Sunday weekly review. Open Excel, fill Weekly Review sheet, paste summary into Claude Code."),
+     "Saturday review. 1) Update README progress numbers. 2) Write LinkedIn post. 3) Schedule for Monday 8am. 4) Plan next week Krish Naik videos. 5) Update Study_Progress_Tracker weekly summary."),
 ]
 
 def play_sound():
@@ -101,8 +101,8 @@ def get_todays_alarms():
         return WEEKDAY_ALARMS
     else:
         alarms = WEEKEND_ALARMS.copy()
-        if today == 6:
-            alarms += SUNDAY_EXTRA
+        if today == 5:  # Saturday
+            alarms += SATURDAY_EXTRA
         return alarms
 
 def parse_time(time_str):
