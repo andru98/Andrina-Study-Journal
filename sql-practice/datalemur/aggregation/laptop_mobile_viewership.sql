@@ -1,6 +1,7 @@
 -- Problem: Laptop vs Mobile Viewership
 -- Source: DataLemur
--- Link: https://datalemur.com/questions/laptop-mobile-viewership
+-- Link: https://datalemur.com/questions/laptop-mo
+bile-viewership
 
 -- Topic: CASE WHEN & Conditional Aggregation
 -- Difficulty: Easy
