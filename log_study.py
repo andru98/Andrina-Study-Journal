@@ -1,12 +1,26 @@
 #!/usr/bin/env python3
 """
-Auto Study Logger
+Auto Study Logger — updated for new tracker layout
 Usage: python3 log_study.py
 Paste your daily log when prompted, press Enter twice when done.
 Script appends to Excel, commits to GitHub automatically.
+
+New Daily Log columns (updated tracker):
+Col 1:  Day           ← auto-filled (pre-numbered in tracker)
+Col 2:  Date
+Col 3:  Month
+Col 4:  Track
+Col 5:  Topics Covered
+Col 6:  Hours
+Col 7:  SQL Problems
+Col 8:  Python Article
+Col 9:  Krish Naik
+Col 10: DSA Problem
+Col 11: GitHub ✓
+Col 12: Stuck On
+Col 13: Key Insight / Lesson
 """
 
-import sys
 import os
 import re
 from datetime import datetime
@@ -17,101 +31,125 @@ EXCEL_PATH = Path.home() / "Desktop" / "Andrina-study-journey" / "Study_Progress
 REPO_PATH  = Path.home() / "Desktop" / "Andrina-study-journey"
 # ─────────────────────────────────────────────────────────────
 
+
 def parse_log(text):
-    """Parse the log text into structured fields."""
-    text = text.lower()
+    t = text.lower()
 
     # Date
-    date_match = re.search(r'(\w+ \d+|\d{1,2}[\/\-]\d{1,2})', text)
-    date = datetime.today().strftime('%Y-%m-%d')
+    date = datetime.today().strftime('%b %d %Y')
 
     # Month
-    month = 'Month 1'
+    month = 'May — Month 1'
+    month_map = {
+        1: 'May — Month 1',
+        2: 'Jun — Month 2',
+        3: 'Jul — Month 3',
+        4: 'Aug — Month 4',
+        5: 'Sep — Month 5',
+        6: 'Oct — Month 6',
+        7: 'Nov — Month 7',
+        8: 'Dec — Month 8',
+    }
     for i in range(8, 0, -1):
-        if f'month {i}' in text:
-            month = f'Month {i}'
+        if f'month {i}' in t:
+            month = month_map[i]
             break
 
     # Track
     track = 'DE'
-    if 'all' in text and 'track' in text:
-        track = 'All'
-    elif 'de+ds' in text or ('de' in text and 'ds' in text):
+    if 'de+ds' in t or ('de' in t and 'ds' in t):
         track = 'DE+DS'
-    elif 'agentic' in text or ' ai' in text:
+    elif 'agentic' in t or ' ai' in t:
         track = 'AI'
-    elif 'ds' in text or 'data science' in text or 'ml' in text:
+    elif 'ds' in t or 'data science' in t or 'ml' in t:
         track = 'DS'
+    elif 'de' in t or 'data engineering' in t:
+        track = 'DE'
 
-    # Topics
+    # Topics Covered
     topics = ''
-    for pattern in [r'topics?[:\s]+([^,\n]+)', r'studied[:\s]+([^,\n]+)']:
-        m = re.search(pattern, text)
+    for pattern in [r'topics?[:\s]+([^,\n]+)', r'studied[:\s]+([^,\n]+)', r'covered[:\s]+([^,\n]+)']:
+        m = re.search(pattern, t)
         if m:
             topics = m.group(1).strip()
             break
-    if not topics:
-        m = re.search(r'log[^:]*:(.*?)(?:hours?|$)', text)
-        if m:
-            topics = m.group(1).strip()[:100]
 
     # Hours
     hours = 0
-    m = re.search(r'(\d+\.?\d*)\s*h(?:our|r)?s?', text)
+    m = re.search(r'(\d+\.?\d*)\s*h(?:our|r)?s?', t)
     if m:
         hours = float(m.group(1))
 
-    # SQL problems
+    # SQL Problems
     sql = 0
-    m = re.search(r'(\d+)\s*sql', text)
+    m = re.search(r'(\d+)\s*sql', t)
     if m:
         sql = int(m.group(1))
 
-    # GitHub
-    github = 'Yes' if any(w in text for w in ['github yes','committed','pushed','git yes']) else \
-             'No' if 'github no' in text or 'no github' in text else ''
+    # Python Article — did they read/code a DataVidhya article?
+    python_article = ''
+    if any(w in t for w in ['python article yes', 'article yes', 'datavidhya yes', 'read article']):
+        python_article = 'Yes'
+    elif any(w in t for w in ['python article no', 'article no', 'no article']):
+        python_article = 'No'
 
     # Krish Naik
-    krish = 'Yes' if any(w in text for w in ['krish yes','krish naik yes','attended krish']) else \
-            'No' if any(w in text for w in ['krish no','no krish']) else ''
+    krish = ''
+    if any(w in t for w in ['krish yes', 'krish naik yes', 'attended krish', 'watched krish']):
+        krish = 'Yes'
+    elif any(w in t for w in ['krish no', 'no krish']):
+        krish = 'No'
 
-    # PyCharm
-    pycharm = 'Yes' if any(w in text for w in ['pycharm yes','yes pycharm','pycharm multiple']) else \
-              'Multiple' if 'multiple' in text and 'pycharm' in text else \
-              'No' if 'pycharm no' in text or 'no pycharm' in text else ''
+    # DSA Problem — which problem did they do?
+    dsa = ''
+    m = re.search(r'dsa[:\s]+([^,\.\n]+)', t)
+    if m:
+        dsa = m.group(1).strip()
+    else:
+        m = re.search(r'lc\s*\d+[^,\.\n]*', t)
+        if m:
+            dsa = m.group(0).strip()
+        elif 'no dsa' in t or 'dsa no' in t:
+            dsa = 'None'
 
-    # Stuck on
+    # GitHub
+    github = ''
+    if any(w in t for w in ['github yes', 'committed', 'pushed', 'git yes']):
+        github = 'Yes'
+    elif any(w in t for w in ['github no', 'no github']):
+        github = 'No'
+
+    # Stuck On
     stuck = ''
-    m = re.search(r'stuck\s+on[:\s]+([^,\.\n]+)', text)
+    m = re.search(r'stuck\s+on[:\s]+([^,\.\n]+)', t)
     if m:
         stuck = m.group(1).strip()
 
-    # Insight
+    # Key Insight / Lesson
     insight = ''
-    for pattern in [r'insight[:\s]+([^,\.\n]+)', r'learned[:\s]+([^,\.\n]+)',
-                    r'clicked[:\s]+([^,\.\n]+)']:
-        m = re.search(pattern, text)
+    for pattern in [r'insight[:\s]+([^,\.\n]+)', r'learned[:\s]+([^,\.\n]+)', r'clicked[:\s]+([^,\.\n]+)']:
+        m = re.search(pattern, t)
         if m:
             insight = m.group(1).strip()
             break
 
     return {
-        'date': date,
-        'month': month,
-        'track': track,
-        'topics': topics.title() if topics else '',
-        'hours': hours,
-        'sql': sql,
-        'github': github,
-        'krish': krish,
-        'pycharm': pycharm,
-        'stuck': stuck.title() if stuck else '',
-        'insight': insight.title() if insight else '',
+        'date':           date,
+        'month':          month,
+        'track':          track,
+        'topics':         topics.title() if topics else '',
+        'hours':          hours,
+        'sql':            sql,
+        'python_article': python_article,
+        'krish':          krish,
+        'dsa':            dsa.title() if dsa else '',
+        'github':         github,
+        'stuck':          stuck.title() if stuck else '',
+        'insight':        insight.title() if insight else '',
     }
 
 
 def append_to_excel(data):
-    """Append parsed log data to the Daily Log sheet."""
     try:
         from openpyxl import load_workbook
     except ImportError:
@@ -120,135 +158,147 @@ def append_to_excel(data):
         from openpyxl import load_workbook
 
     if not EXCEL_PATH.exists():
-        print(f"Excel file not found at {EXCEL_PATH}")
-        print("Please copy your Study_Progress_Tracker.xlsx to ~/anna-study-journey/")
+        print(f"\n  Excel file not found at:\n  {EXCEL_PATH}")
+        print("  Please check the EXCEL_PATH in the script config.")
         return False
 
     wb = load_workbook(EXCEL_PATH)
     ws = wb['Daily Log']
 
-    # Find next empty row (after header row 3)
-    next_row = 4
-    for row in ws.iter_rows(min_row=4, max_col=1):
-        if row[0].value is None:
-            next_row = row[0].row
+    # Find first row where Date (col 2) is empty but Day (col 1) is pre-filled
+    target_row = None
+    for row in ws.iter_rows(min_row=3, max_col=2):
+        day_val  = row[0].value
+        date_val = row[1].value
+        if day_val is not None and date_val is None:
+            target_row = row[0].row
             break
-    else:
-        next_row = ws.max_row + 1
 
-    # Write data
-    ws.cell(row=next_row, column=1,  value=data['date'])
-    ws.cell(row=next_row, column=2,  value=data['month'])
-    ws.cell(row=next_row, column=3,  value=data['track'])
-    ws.cell(row=next_row, column=4,  value=data['topics'])
-    ws.cell(row=next_row, column=5,  value=data['hours'])
-    ws.cell(row=next_row, column=6,  value=data['sql'])
-    ws.cell(row=next_row, column=7,  value=data['github'])
-    ws.cell(row=next_row, column=8,  value=data['krish'])
-    ws.cell(row=next_row, column=9,  value=data['pycharm'])
-    ws.cell(row=next_row, column=10, value=data['stuck'])
-    ws.cell(row=next_row, column=11, value=data['insight'])
+    if target_row is None:
+        print("  No empty rows found in Daily Log — tracker may be full.")
+        return False
+
+    # Write to correct columns (1-indexed)
+    # Col 1 = Day (already pre-filled — skip)
+    ws.cell(row=target_row, column=2,  value=data['date'])           # Date
+    ws.cell(row=target_row, column=3,  value=data['month'])          # Month
+    ws.cell(row=target_row, column=4,  value=data['track'])          # Track
+    ws.cell(row=target_row, column=5,  value=data['topics'])         # Topics Covered
+    ws.cell(row=target_row, column=6,  value=data['hours'])          # Hours
+    ws.cell(row=target_row, column=7,  value=data['sql'])            # SQL Problems
+    ws.cell(row=target_row, column=8,  value=data['python_article']) # Python Article
+    ws.cell(row=target_row, column=9,  value=data['krish'])          # Krish Naik
+    ws.cell(row=target_row, column=10, value=data['dsa'])            # DSA Problem
+    ws.cell(row=target_row, column=11, value=data['github'])         # GitHub ✓
+    ws.cell(row=target_row, column=12, value=data['stuck'])          # Stuck On
+    ws.cell(row=target_row, column=13, value=data['insight'])        # Key Insight / Lesson
 
     wb.save(EXCEL_PATH)
-    print(f"  Excel updated — row {next_row} written")
+    print(f"  Excel updated — row {target_row} written")
     return True
 
 
 def git_commit(data):
-    """Commit and push the updated Excel to GitHub."""
     os.chdir(REPO_PATH)
-    msg = f"Day log {data['date']} — {data['track']} — {data['hours']}hrs — {data['sql']} SQL"
-    os.system(f'git add "{EXCEL_PATH}"')
+    msg = f"Study log {data['date']} — {data['track']} — {data['hours']}hrs — {data['sql']} SQL"
+    os.system(f'git add "{EXCEL_PATH.name}"')
     os.system(f'git commit -m "{msg}"')
     os.system('git push')
     print(f"  GitHub committed: {msg}")
 
 
 def evaluate_progress(data):
-    """Give progress feedback based on 6-8 hour daily target."""
-    print("\n" + "="*55)
+    print("\n" + "=" * 55)
     print("  PROGRESS EVALUATION")
-    print("="*55)
+    print("=" * 55)
 
-    warnings = []
+    warnings  = []
     positives = []
 
-    # ── Hours — target is 6-8 hrs per day ──────────────────
+    # Hours
     if data['hours'] >= 6:
         positives.append(f"{data['hours']} hrs studied — on target")
     elif data['hours'] >= 4:
         warnings.append(f"{data['hours']} hrs — target is 6-8 hrs per day")
     elif data['hours'] >= 2:
-        warnings.append(f"Only {data['hours']} hrs — significantly below 6hr target")
+        warnings.append(f"Only {data['hours']} hrs — below 6hr target")
     else:
         warnings.append(f"Only {data['hours']} hrs — needs urgent attention tomorrow")
 
-    # ── SQL ─────────────────────────────────────────────────
+    # SQL
     if data['sql'] >= 2:
         positives.append(f"{data['sql']} SQL problems — daily habit maintained")
     elif data['sql'] == 1:
         warnings.append("Only 1 SQL problem — target is 2 minimum every day")
     else:
-        warnings.append("No SQL problems today — daily habit broken, do 4 tomorrow")
+        warnings.append("No SQL problems today — do 4 tomorrow to catch up")
 
-    # ── GitHub ──────────────────────────────────────────────
-    if data['github'] == 'Yes':
-        positives.append("GitHub committed — green square earned")
-    else:
-        warnings.append("No GitHub commit — push something before midnight")
+    # Python Article
+    if data['python_article'] == 'Yes':
+        positives.append("DataVidhya Python article read + recoded")
+    elif data['python_article'] == 'No':
+        warnings.append("No Python article today — read + recode tomorrow")
 
-    # ── Krish Naik ──────────────────────────────────────────
+    # Krish Naik
     if data['krish'] == 'Yes':
         positives.append("Krish Naik session watched + recoded")
     elif data['krish'] == 'No':
         warnings.append("No Krish Naik today — stay on catch-up schedule")
 
-    # ── Print results ────────────────────────────────────────
+    # DSA
+    if data['dsa'] and data['dsa'].lower() != 'none':
+        positives.append(f"DSA done — {data['dsa']}")
+    else:
+        warnings.append("No DSA today — daily habit broken, do it first tomorrow")
+
+    # GitHub
+    if data['github'] == 'Yes':
+        positives.append("GitHub committed — green square earned")
+    else:
+        warnings.append("No GitHub commit — push something before midnight")
+
     for p in positives:
         print(f"  + {p}")
     for w in warnings:
         print(f"  ! {w}")
 
-    # ── Overall verdict ──────────────────────────────────────
     print()
     if not warnings:
         print("  Perfect day Anna. This is what 8 months of")
         print("  consistency looks like. Keep this up.")
     elif len(warnings) == 1:
-        print(f"  Strong day overall. One thing to fix:")
+        print(f"  Strong day overall. One thing to fix tomorrow:")
         print(f"  {warnings[0]}")
     elif len(warnings) == 2:
-        print(f"  Decent day. Two things to tighten tomorrow.")
+        print("  Decent day. Two things to tighten tomorrow.")
     else:
-        print(f"  Below target today. Tomorrow:")
-        print(f"  Start with SQL first thing. No exceptions.")
+        print("  Below target today. Tomorrow:")
+        print("  SQL first. Then DSA. No exceptions.")
 
-    # ── Stuck on hint ────────────────────────────────────────
     if data['stuck']:
         print()
         print(f"  Stuck on: {data['stuck']}")
         print("  Ask Claude: 'explain [topic] with a biochemistry")
         print("  analogy and a code example under 20 lines'")
 
-    # ── Hours milestone ──────────────────────────────────────
     print()
     print(f"  At 6 hrs/day — you finish 8 months in Dec 2026.")
-    print(f"  At 4 hrs/day — you need to extend to Feb 2027.")
     print(f"  Today: {data['hours']} hrs.")
-    print("="*55)
+    print("=" * 55)
 
 
 def main():
-    print("\n" + "="*55)
+    print("\n" + "=" * 55)
     print("  ANNA'S DAILY STUDY LOG")
-    print("  Target: 6-8 hrs/day · 2 SQL · 1 GitHub commit")
-    print("="*55)
+    print("  Target: 6-8 hrs/day · 2 SQL · DSA · 1 GitHub commit")
+    print("=" * 55)
     print("\nPaste your log below (press Enter twice when done):\n")
     print("Example:")
-    print("  May 1, Month 1, DE, pandas groupby merge pivot,")
-    print("  6 hours, 2 SQL, GitHub yes, Krish yes,")
-    print("  PyCharm yes, stuck on merge vs join,")
-    print("  insight groupby in pandas is same as GROUP BY in SQL")
+    print("  May 18, Month 1, DE, topics: pandas groupby merge,")
+    print("  6 hours, 2 SQL, article yes, krish yes,")
+    print("  dsa: LC 1 Two Sum, github yes,")
+    print("  stuck on: merge vs join,")
+    print("  insight: groupby in pandas = GROUP BY in SQL")
     print()
 
     lines = []
@@ -262,7 +312,6 @@ def main():
             break
 
     raw_text = ' '.join(lines)
-
     if not raw_text.strip():
         print("No log entered. Exiting.")
         return
@@ -271,17 +320,18 @@ def main():
     data = parse_log(raw_text)
 
     print("\nParsed values:")
-    print(f"  Date:     {data['date']}")
-    print(f"  Month:    {data['month']}")
-    print(f"  Track:    {data['track']}")
-    print(f"  Topics:   {data['topics']}")
-    print(f"  Hours:    {data['hours']}")
-    print(f"  SQL:      {data['sql']}")
-    print(f"  GitHub:   {data['github']}")
-    print(f"  Krish:    {data['krish']}")
-    print(f"  PyCharm:  {data['pycharm']}")
-    print(f"  Stuck on: {data['stuck']}")
-    print(f"  Insight:  {data['insight']}")
+    print(f"  Date:           {data['date']}")
+    print(f"  Month:          {data['month']}")
+    print(f"  Track:          {data['track']}")
+    print(f"  Topics:         {data['topics']}")
+    print(f"  Hours:          {data['hours']}")
+    print(f"  SQL Problems:   {data['sql']}")
+    print(f"  Python Article: {data['python_article']}")
+    print(f"  Krish Naik:     {data['krish']}")
+    print(f"  DSA Problem:    {data['dsa']}")
+    print(f"  GitHub:         {data['github']}")
+    print(f"  Stuck On:       {data['stuck']}")
+    print(f"  Insight:        {data['insight']}")
 
     confirm = input("\nLooks correct? (y/n): ").strip().lower()
     if confirm != 'y':
@@ -297,7 +347,7 @@ def main():
         evaluate_progress(data)
         print("\nDone. See you tomorrow Anna.\n")
     else:
-        print("Excel write failed — check file path in script config.")
+        print("Excel write failed — check EXCEL_PATH in script config.")
 
 
 if __name__ == '__main__':
