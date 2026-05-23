@@ -27,7 +27,7 @@ from datetime import datetime
 from pathlib import Path
 
 # ── CONFIG — update these paths ──────────────────────────────
-EXCEL_PATH = Path.home() / "Desktop" / "Andrina-study-journey" / "Study_Progress_Tracker.xlsx"
+EXCEL_PATH = Path.home() / "Desktop" / "Andrina-study-journey" / "Study_Progress_Tracker_May18.xlsx"
 REPO_PATH  = Path.home() / "Desktop" / "Andrina-study-journey"
 # ─────────────────────────────────────────────────────────────
 
