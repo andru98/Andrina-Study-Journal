@@ -22,3 +22,4 @@ WHERE t.status = 'Completed'
 GROUP BY u.city
 ORDER BY total_orders DESC
 LIMIT 3;
+
