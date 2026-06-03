@@ -97,19 +97,7 @@ ORDER BY
 -- Real use: role-based access, day-of-week rules, feature flags
 
 -- Trading journal example: Friday rules differ from other days
-SELECT
-    trade_date,
-    symbol,
-    pnl,
-    emotion
-FROM trades
-WHERE
-    CASE
-        WHEN DAYOFWEEK(trade_date) = 6 THEN  -- Friday
-            CASE WHEN symbol = 'SPY' THEN 1 ELSE 0 END
-        ELSE                                  -- Mon–Thu
-            CASE WHEN emotion != 'Revenge' THEN 1 ELSE 0 END
-    END = 1;
+
 
 -- Interview note:
 -- CASE in WHERE returns 1 (true) or 0 (false).
