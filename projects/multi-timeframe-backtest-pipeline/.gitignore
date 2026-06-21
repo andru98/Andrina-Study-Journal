@@ -1,0 +1,27 @@
+# Virtual environment
+venv/
+
+# Data files - never push raw data to GitHub
+data/bronze/
+data/silver/
+data/gold/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Parquet and output files
+*.parquet
+*.png
+*.csv
+
+# Mac specific
+.DS_Store
+
+# Environment variables and secrets
+.env
+*.yaml.local
+
+# PyCharm
+.idea/
