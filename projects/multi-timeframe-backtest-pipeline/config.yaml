@@ -1,0 +1,28 @@
+# Pipeline Configuration
+
+tickers:
+  - SPY
+  - TSLA
+
+timeframes:
+  - 5m
+  - 15m
+  - 1h
+  - 1d
+
+data:
+  period: 2y
+  bronze_path: data/bronze
+  silver_path: data/silver
+  gold_path: data/gold
+
+strategies:
+  ema_fast: 9
+  ema_slow: 21
+  vwap: true
+  volume_confirmation: true
+
+backtest:
+  mode: historical
+  start_date: "2023-06-01"
+  end_date: "2025-06-01"
