@@ -20,6 +20,26 @@ def explore_data():
     print("\nNull counts:")
     print(df.isnull().sum())
 
+def fetch_data(ticker, timeframe, config):
+    # 1. validate ticker
+    # 2. validate timeframe
+    # 3. check if bronze file exists
+    # 4. call yfinance with retry logic
+    # 5. validate returned data
+    # 6. return dataframe
+def validate_data(df, ticker, timeframe):
+    # 1. empty check
+    # 2. row count within expected range
+    # 3. null check on critical columns
+    # 4. date range covers expected period
+    # 5. log all findings
+    # return True if valid, False if not
+def save_to_bronze(df, ticker, timeframe, config):
+    # 1. flatten MultiIndex
+    # 2. convert timezone
+    # 3. build file path
+    # 4. save as parquet
+    # 5. log success
 
 def main():
     config = load_config()
@@ -29,6 +49,14 @@ def main():
     print(f"Tickers: {tickers}")
     print(f"Timeframes: {timeframes}")
 
+    for ticker in tickers:
+        for timeframe in timeframes:
+            try:
+                df = fetch_data(ticker, timeframe, config)
+                save_to_bronze(df, ticker, timeframe, config)
+            except Exception as e:
+                print(f"Failed: {ticker} {timeframe} — {e}")
+                continue
     explore_data()
 
 
