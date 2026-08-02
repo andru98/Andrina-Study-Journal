@@ -1,0 +1,67 @@
+Airflow is an open source framework which can be used as an Orchestrator
+
+Not to do with airflow:
+It is not a data processing/real time processing or DAG running framework.
+It is not an ETL framework-it can only schedule and orchestrate
+
+            Task 2              Task 4
+Task 1            -------If
+            Task 2              Task 5
+
+            Complex + state management
+
+ Task 1 node will be executed first as there are no dependency , then two task 2 will run in parallel, if one of the task2 failed then If wont be executed as both task needs to be successful
+ based on if logic either Task 4 or task 5 will be executed.
+
+ CORE COMPONENTS OF AIRFLOW
+
+ -Metadata Database->airflow needs to store all the metadata about the DAGS for instance, DAG runs, schedule, status, task instance etc
+ -DAG File Processor-> It will go to dag folder and will parse it and store the serialized dag into the DB.
+ -API Server -> middleman of everything , airflow ui is using api to render dag from metadata db, even dag file processor is using api server for storing dag in the db
+ -Scheduler-> responsible for what and when tasks needs to be executed, gets information about dasg through API from metadata db and stores info in the execution queue (not the final queue)
+        its for executor not workers
+ -Executor -> executor will decide the how and where tasks need to be run.It takes the order from scheduler and coordinate the tasks depending on different scenarios.
+        It decides the strategy and put all the tasks in the redis queue
+ -Workers-> they are the real layer for execution, they will take the task from redis queue based on prioritization order, it will execute and write back to db via API.
+ -Queue -> Workers will take the tasks from the queue that executor has dumped to and work on the most important task first
+ -Triggerer -> defer function will call triggerer and when finished its linked to the worker to finish rest of the execution and back to db through API. Remember,triggerer cant directly hand
+ over the task to worker, it will change the state of the task and that will be stored in the db
+
+defer() called:
+→ Worker hands off to Triggerer
+→ Worker freed immediately
+
+Triggerer watches:
+→ lightweight process
+→ can watch 1000s of conditions simultaneously
+→ no heavy computation
+
+Condition met:
+→ Triggerer CANNOT directly tell Worker
+→ Triggerer updates task STATE in database
+→ "this task is ready to resume"
+
+Scheduler sees state change:
+→ assigns task back to available Worker
+→ Worker resumes from where it left off
+
+-> start_date(optional), end_date(optional), catchup(optional), schedule (required)
+Catchup tells airflow to run the DAG for the missed intervals
+Presets Schedule->@daily,weekly,hourly
+
+DAG-> directed (gives direction what to do next), acyclic (cant be cyclic or go back) graph
+Task Instance -> Its a single unit of work, make task as granular as you can
+
+Operator -> what task you want to run (python, sql, or batch operator) , predefined template that defines the category of task.
+
+How DAGS are synced?
+-> you wrote the dags in pycharm, these folder will be synced in another folder in docker same dags folder (/opt/airflow/dags) with bind mounts. dag processor will parse
+  the dags into the db, once db knows it will portray in airflow UI
+
+
+Xcoms in airflow
+suppose one task is making an api call and next task using the output of api call of first task where the valueofoutput needs to travel to task 2  (like cleaning processing etc) wherei
+it will be input for task 1 output. to travel the information between the tasks we use xcom
+
+
+
