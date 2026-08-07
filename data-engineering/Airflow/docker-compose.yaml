@@ -53,6 +53,7 @@ x-airflow-common:
   # build: .
   env_file:
     - ${ENV_FILE_PATH:-.env}
+    - .env.spotify
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -81,6 +82,8 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - /Users/andrinashrestha/Desktop/Andrina-study-journey/projects/spotify-pipeline/airflow/dags:/opt/airflow/dags
+    - /Users/andrinashrestha/Desktop/Andrina-study-journey/projects/spotify-pipeline/src:/opt/airflow/spotify_src
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
