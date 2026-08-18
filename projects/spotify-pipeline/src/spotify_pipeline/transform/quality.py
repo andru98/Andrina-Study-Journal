@@ -1,6 +1,7 @@
-from spotify_pipeline.utils.logger import get_logger
 from datetime import datetime
 import pandas as pd
+from spotify_pipeline.utils.logger import get_logger
+
 
 logger = get_logger(__name__)
 
@@ -26,16 +27,19 @@ def check_row_count(df: pd.DataFrame, entity: str, min_rows: int,) -> None:
     elif row_count < min_rows:
         logger.warning(f"[{entity}] has {row_count} rows which is lower than {min_rows}")
     else:
-        logger.info(f"[{entity}] has {row_count} rows!")
+        logger.warning(f"[{entity}] has {row_count} rows!")
 
-def check_freshness(df: pd.DataFrame, entity:str, max_hours:int = 25) -> None:
+def check_freshness(df: pd.DataFrame, entity: str, max_hours: int = 25) -> None:
     """Check data was processed within expected time window."""
-    if 'processed_at' not in df.columns:
-        logger.warning (f"[{entity}] no processed_at column")
-    latest = pd.to_datetime(df['processed_at'].max())
+    if "processed_at" not in df.columns:
+        logger.warning(f"[{entity}] no processed_at column")
+        return
+
+    latest = pd.to_datetime(df["processed_at"]).max()
     hours_old = (datetime.utcnow() - latest.replace(tzinfo=None)).total_seconds() / 3600
+
     if hours_old > max_hours:
-        logger.warning(f"[{entity}] data is {hours_old:.1f} hours old️")
+        logger.warning(f"[{entity}] data is {hours_old:.1f} hours old")
     else:
         logger.info(f"[{entity}] freshness OK — {hours_old:.1f} hours old")
 

@@ -6,16 +6,11 @@ from datetime import datetime
 from spotify_pipeline.config import config
 from spotify_pipeline.utils.logger import get_logger
 from spotify_pipeline.utils.decorators import log_execution, retry
-
+from spotify_pipeline.load.s3 import get_s3_client
 logger = get_logger(__name__)
 
 def read_silver(entity: str) -> pd.DataFrame:
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=config.aws_access_key_id,
-        aws_secret_access_key=config.aws_secret_access_key,
-        region_name=config.aws_region
-    )
+    s3 = get_s3_client()
     response = s3.list_objects_v2(
         Bucket=config.aws_bucket_transformed,
         Prefix=f"silver/{entity}/"
@@ -67,14 +62,13 @@ def top_artists()-> pd.DataFrame:
           explicit_count=("explicit", "sum")
     ).reset_index()
     print(agg_df.columns.tolist())
-
-    # Filter FIRST → remove 0 track_count rows
-    agg_df = agg_df[agg_df["track_count"] > 0]
-
-    # NOW divide safely — no zeros possible
-    agg_df["explicit_pct"] = (
-            agg_df["explicit_count"] / agg_df["track_count"] * 100
-    ).round(2)
+    print("track_count values:", agg_df["track_count"].values)
+    print("explicit_count values:", agg_df["explicit_count"].values)
+    print("any zero track_count:", (agg_df["track_count"] == 0).any())
+    agg_df["explicit_pct"] = np.where(
+         agg_df["track_count"]>0,
+        (agg_df["explicit_count"]/agg_df["track_count"] * 100).round(2), 0)
+    agg_df = agg_df[agg_df["track_count"]>0]
     final_df = agg_df.sort_values("track_count", ascending=False)
     return final_df
 
