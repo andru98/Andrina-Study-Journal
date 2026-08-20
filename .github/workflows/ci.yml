@@ -1,0 +1,84 @@
+name: Spotify Pipeline CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/spotify-pipeline/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'projects/spotify-pipeline/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+        working-directory: projects/spotify-pipeline
+
+      - name: Run tests
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          AWS_BUCKET_RAW: spotify-raw-anna-2026
+          AWS_BUCKET_TRANSFORMED: spotify-transform-anna-2026
+          AWS_REGION: us-east-2
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: pytest tests/ -v
+        working-directory: projects/spotify-pipeline
+
+  deploy:
+    needs: test        # ← only runs if tests pass
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'  # ← only on main branch
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Install Linux dependencies
+        run: |
+          pip install requests pydantic pydantic-settings python-dotenv \
+            --platform manylinux2014_x86_64 \
+            --only-binary=:all: \
+            --python-version 3.12 \
+            --implementation cp \
+            -t lambda_package/
+
+      - name: Package Lambda
+        run: |
+          cp -r projects/spotify-pipeline/src/spotify_pipeline lambda_package/
+          cp projects/spotify-pipeline/lambda_extract.py lambda_package/
+          cp projects/spotify-pipeline/lambda_transform.py lambda_package/
+          cd lambda_package && zip -r ../spotify_lambda_final.zip .
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name spotify-extract \
+            --zip-file fileb://spotify_lambda_final.zip
+
+          aws lambda update-function-code \
+            --function-name spotify-transform \
+            --zip-file fileb://spotify_lambda_final.zip
