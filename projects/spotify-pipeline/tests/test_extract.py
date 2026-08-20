@@ -21,7 +21,8 @@ def make_fake_items():
                 "name": "After Hours",
                 "release_date": "2020-03-20",
                 "total_tracks": 14,
-                "external_urls": {"spotify": "http://spotify.com/album1"}
+                "external_urls": {"spotify": "http://spotify.com/album1"},
+                "artists": [{"id": "artist1", "name": "The Weeknd"}]
             },
             "artists": [
                 {
