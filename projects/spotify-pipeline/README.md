@@ -27,7 +27,7 @@ layers, and surfaces analytical insights via Amazon Athena SQL queries.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ![Architecture Diagram](docs/spotify_architecture.svg)
 
