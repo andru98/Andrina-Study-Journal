@@ -1,0 +1,11 @@
+emp_id,name,dept,salary,join_date,skills
+101,john doe,Engineering,95000,2021-03-15,"Python,Spark,SQL"
+102,jane smith,Engineering,88000,2020-07-01,"Java,Spark"
+103,alex kim,Sales,62000,2022-01-10,"Excel,SQL"
+104,priya patel,Engineering,95000,2019-11-20,"Python,SQL,Airflow"
+105,michael chen,Sales,58000,2021-06-05,"Excel"
+106,sara jones,HR,54000,2023-02-14,"Communication"
+107,li wei,Engineering,120000,2018-09-01,"Python,Spark,SQL,Kafka"
+108,omar hassan,Sales,62000,2022-08-19,"Excel,SQL,Negotiation"
+109,grace lee,HR,57000,2020-12-01,"Communication,Recruiting"
+110,daniel brown,Engineering,79000,2023-05-23,"Python,SQL"
