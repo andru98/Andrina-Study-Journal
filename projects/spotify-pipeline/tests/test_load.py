@@ -80,7 +80,7 @@ def test_save_artists_silver_correct_bucket():
 
 def test_save_to_gold_calls_s3():
     """save_to_gold calls S3 put_object exactly once."""
-    with patch("spotify_pipeline.gold.save_gold.boto3.client") as mock_boto:
+    with patch("spotify_pipeline.load.s3.boto3.client") as mock_boto:
         mock_s3 = MagicMock()
         mock_boto.return_value = mock_s3
 
@@ -96,7 +96,7 @@ def test_save_to_gold_calls_s3():
 
 def test_save_to_gold_correct_bucket():
     """save_to_gold uses transformed S3 bucket."""
-    with patch("spotify_pipeline.gold.save_gold.boto3.client") as mock_boto:
+    with patch("spotify_pipeline.load.s3.boto3.client") as mock_boto:
         mock_s3 = MagicMock()
         mock_boto.return_value = mock_s3
 
@@ -113,7 +113,7 @@ def test_save_to_gold_correct_bucket():
 
 def test_save_to_gold_correct_entity_in_key():
     """save_to_gold uses entity name in S3 key path."""
-    with patch("spotify_pipeline.gold.save_gold.boto3.client") as mock_boto:
+    with patch("spotify_pipeline.load.s3.boto3.client") as mock_boto:
         mock_s3 = MagicMock()
         mock_boto.return_value = mock_s3
 
