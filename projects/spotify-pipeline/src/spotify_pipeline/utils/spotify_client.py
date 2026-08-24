@@ -1,5 +1,4 @@
-# src/spotify_pipeline/utils/spotify_client.py
-# src/spotify_pipeline/utils/spotify_client.py
+
 import requests
 import json
 from spotify_pipeline.utils.logger import get_logger

@@ -1,7 +1,6 @@
 
 
 import pandas as pd
-import boto3
 import io
 from datetime import datetime
 from spotify_pipeline.config import config

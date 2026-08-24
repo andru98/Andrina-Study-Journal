@@ -11,7 +11,7 @@ def check_nulls(df: pd.DataFrame, entity:str)-> None:
         if count > 0:
             logger.warning(f"[{entity}] {col} : {count} nulls found!")
         else:
-            logger.info (f"[{entity}] {col} has no null values!")
+            logger.info(f"[{entity}] {col} has no null values!")
 
 def check_duplicates(df:pd.DataFrame, entity:str, key:str )-> None:
     dupes = df.duplicated(subset=[key]).sum()
@@ -27,7 +27,7 @@ def check_row_count(df: pd.DataFrame, entity: str, min_rows: int,) -> None:
     elif row_count < min_rows:
         logger.warning(f"[{entity}] has {row_count} rows which is lower than {min_rows}")
     else:
-        logger.warning(f"[{entity}] has {row_count} rows!")
+        logger.info(f"[{entity}] has {row_count} rows!")
 
 def check_freshness(df: pd.DataFrame, entity: str, max_hours: int = 25) -> None:
     """Check data was processed within expected time window."""

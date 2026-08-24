@@ -1,6 +1,4 @@
-# src/spotify_pipeline/extract/artists.py
-# src/spotify_pipeline/utils/spotify_client.py
-# src/spotify_pipeline/extract/artists.py
+
 from spotify_pipeline.utils.logger import get_logger
 
 logger = get_logger(__name__)

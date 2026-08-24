@@ -1,7 +1,9 @@
 # src/spotify_pipeline/load/s3.py
 import json
+import pandas as pd
 import os
 import boto3
+import io
 from datetime import datetime
 from spotify_pipeline.config import config
 from spotify_pipeline.utils.logger import get_logger
@@ -122,3 +124,33 @@ def read_bronze(entity: str, date:str = None) -> list:
         f"from s3://{config.aws_bucket_raw}/{latest_key}"
     )
     return data
+
+@log_execution
+def read_silver(entity: str) -> pd.DataFrame:
+    """
+    Read all Silver Parquet files for given entity.
+    Combines all partitions, deduplicates keeping latest.
+    """
+    s3 = get_s3_client()
+    response = s3.list_objects_v2(
+        Bucket=config.aws_bucket_transformed,
+        Prefix=f"silver/{entity}/"
+    )
+    dfs = []
+    for obj in response["Contents"]:
+        file = s3.get_object(
+            Bucket=config.aws_bucket_transformed,
+            Key=obj["Key"]
+        )
+        buffer = io.BytesIO(file["Body"].read())
+        df = pd.read_parquet(buffer)
+        dfs.append(df)
+
+    combined: pd.DataFrame = pd.concat(dfs, ignore_index=True)
+    if "processed_at" in combined.columns:
+        combined = combined.sort_values("processed_at", ascending=False)
+    combined = combined.drop_duplicates(
+        subset=[f"{entity[:-1]}_id"],
+        keep="first"
+    )
+    return combined
