@@ -85,11 +85,6 @@ def read_bronze(entity: str, date:str = None) -> list:
             f"{now.year}/{now.month:02d}/{now.day:02d}/"
         )
 
-    # Build today's partition prefix
-    prefix = (
-        f"bronze/{entity}/"
-        f"{now.year}/{now.month:02d}/{now.day:02d}/"
-    )
 
     # List all files in today's partition
     response = s3.list_objects_v2(
