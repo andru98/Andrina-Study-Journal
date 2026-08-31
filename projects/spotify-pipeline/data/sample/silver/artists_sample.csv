@@ -1,0 +1,6 @@
+artist_id,name,spotify_url,processed_at,source
+6B5c4sch27tWHAGdarpPaW,Seether,https://api.spotify.com/v1/artists/6B5c4sch27tWHAGdarpPaW,2026-08-31 00:46:12.033244,spotify_search_api
+3fMbdgg4jU18AjLCKBhRSm,Michael Jackson,https://api.spotify.com/v1/artists/3fMbdgg4jU18AjLCKBhRSm,2026-08-31 00:46:12.033244,spotify_search_api
+246dkjvS1zLTtiykXe5h60,Post Malone,https://api.spotify.com/v1/artists/246dkjvS1zLTtiykXe5h60,2026-08-31 00:46:12.033244,spotify_search_api
+1yxSLGMDHlW21z4YXirZDS,Black Eyed Peas,https://api.spotify.com/v1/artists/1yxSLGMDHlW21z4YXirZDS,2026-08-31 00:46:12.033244,spotify_search_api
+5LkHiburgp40vnKs1PFQYR,Nikki Jean,https://api.spotify.com/v1/artists/5LkHiburgp40vnKs1PFQYR,2026-08-31 00:46:12.033244,spotify_search_api

@@ -1,0 +1,6 @@
+track_id,name,duration_ms,popularity,spotify_url,album_id,artist_id,explicit,duration_in_seconds,processed_at,source
+2abHKI9Oox4NBEhOh3HMbq,Country Song,229720,0,https://open.spotify.com/track/2abHKI9Oox4NBEhOh3HMbq,1Bjmcy5hWGdGQ0zANfgIzh,6B5c4sch27tWHAGdarpPaW,False,229.72,2026-08-31 00:46:12.309079,spotify_search_api
+0JkTVcN5kilfMztDb3bKZk,Tomorrow,261574,0,https://open.spotify.com/track/0JkTVcN5kilfMztDb3bKZk,5r35iS0uSSoQBKzQj0IeI3,3Nrfpe0tUJi4K4DXYWgMUX,False,261.57,2026-08-31 00:46:12.309079,spotify_search_api
+1AWQoqb9bSvzTjaLralEkT,Rock Your Body,267266,0,https://open.spotify.com/track/1AWQoqb9bSvzTjaLralEkT,6QPkyl04rXwTGlGlcYaRoW,31TPClRtHm23RisEBtV3X7,False,267.27,2026-08-31 00:46:12.309079,spotify_search_api
+7oOOI85fVQvVnK5ynNMdW7,Rock with You - Single Version,219926,0,https://open.spotify.com/track/7oOOI85fVQvVnK5ynNMdW7,2ZytN2cY4Zjrr9ukb2rqTP,3fMbdgg4jU18AjLCKBhRSm,False,219.93,2026-08-31 00:46:12.309079,spotify_search_api
+0e7ipj03S05BNilyu5bRzt,rockstar (feat. 21 Savage),218146,0,https://open.spotify.com/track/0e7ipj03S05BNilyu5bRzt,6trNtQUgC8cgbWcqoMYkOR,246dkjvS1zLTtiykXe5h60,True,218.15,2026-08-31 00:46:12.309079,spotify_search_api
