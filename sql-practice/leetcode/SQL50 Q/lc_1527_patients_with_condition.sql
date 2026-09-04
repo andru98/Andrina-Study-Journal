@@ -1,0 +1,122 @@
+-- ============================================================
+-- Problem : Patients With a Condition
+-- Source  : LeetCode 1527
+-- Link    : https://leetcode.com/problems/patients-with-a-condition/
+-- Topic   : String Functions / LIKE / Pattern Matching
+-- Level   : Easy
+-- Date    : 2026-09-02
+-- ============================================================
+
+-- PROBLEM STATEMENT:
+-- Table: Patients (patient_id, patient_name, conditions)
+-- conditions = space-separated codes
+-- Find patients with Type I Diabetes (code starts with DIAB1)
+
+-- ============================================================
+-- KEY INSIGHT:
+-- DIAB1 can appear in TWO positions:
+-- 1. START of conditions: "DIAB100 MYOP"
+-- 2. AFTER a space: "ACNE DIAB100"
+--
+-- WRONG approach:
+-- LIKE '%DIAB1%' → matches "SADIAB100" ❌
+-- → SADIAB1 is NOT Type I Diabetes ❌
+-- → no word boundary check ❌
+--
+-- CORRECT approach:
+-- Two conditions with OR:
+-- → LIKE 'DIAB1%'   → starts with DIAB1 ✅
+-- → LIKE '% DIAB1%' → space then DIAB1 ✅
+-- Space = word boundary in conditions string ✅
+-- ============================================================
+
+SELECT patient_id, patient_name, conditions
+FROM Patients
+WHERE conditions LIKE 'DIAB1%'      -- starts with DIAB1 ✅
+   OR conditions LIKE '% DIAB1%';   -- space then DIAB1 ✅
+
+-- ============================================================
+-- EXAMPLE WALKTHROUGH:
+-- "DIAB100 MYOP":
+-- → LIKE 'DIAB1%'   → MATCH ✅ starts with DIAB1
+-- → included ✅
+--
+-- "ACNE DIAB100":
+-- → LIKE 'DIAB1%'   → no match (starts with ACNE)
+-- → LIKE '% DIAB1%' → MATCH ✅ space before DIAB1
+-- → included ✅
+--
+-- "SADIAB100":
+-- → LIKE 'DIAB1%'   → no match (starts with SA)
+-- → LIKE '% DIAB1%' → no match (no space before DIAB1)
+-- → correctly excluded ✅
+--
+-- "DIAB201":
+-- → LIKE 'DIAB1%'   → no match (starts with DIAB2 not DIAB1)
+-- → correctly excluded ✅
+--
+-- "" (empty):
+-- → neither matches ✅
+-- → correctly excluded ✅
+-- ============================================================
+
+-- ============================================================
+-- PATTERN BREAKDOWN '% DIAB1%':
+-- %     = anything before (e.g. "ACNE")
+--       = literal SPACE character ← word boundary ✅
+-- DIAB1 = exact text match
+-- %     = anything after (e.g. "00 MYOP")
+--
+-- Space as word boundary:
+-- conditions = space-separated codes
+-- "ACNE DIAB100 MYOP"
+--       ↑ space separates words
+-- space before DIAB1 = separate word starting with DIAB1 ✅
+-- no space = part of another word (SADIAB1) ❌
+-- ============================================================
+
+-- ============================================================
+-- LIKE PATTERN REFERENCE:
+-- %  = matches any sequence of characters (including none)
+-- _  = matches exactly one character
+--
+-- Examples:
+-- LIKE 'DIAB1%'   → starts with DIAB1 ✅
+-- LIKE '%DIAB1'   → ends with DIAB1 ✅
+-- LIKE '%DIAB1%'  → contains DIAB1 anywhere ← too broad ❌
+-- LIKE '% DIAB1%' → space then DIAB1 ✅ word boundary
+-- LIKE 'DIAB_'    → DIAB + any one char (DIAB1, DIAB2...)
+-- ============================================================
+
+-- ============================================================
+-- COMMON MISTAKES:
+--
+-- 1. Using '%DIAB1%' (no space):
+--    → matches "SADIAB100" ❌ wrong!
+--    → no word boundary check ❌
+--    Fix: use 'DIAB1%' OR '% DIAB1%' ✅
+--
+-- 2. Missing quotes around pattern:
+--    WHERE conditions LIKE DIAB1% ❌ syntax error
+--    WHERE conditions LIKE 'DIAB1%' ✅
+--
+-- 3. Using only one condition:
+--    WHERE conditions LIKE 'DIAB1%' ← misses "ACNE DIAB100" ❌
+--    WHERE conditions LIKE '% DIAB1%' ← misses "DIAB100 MYOP" ❌
+--    Fix: OR both conditions ✅
+-- ============================================================
+
+-- ============================================================
+-- KEY PATTERN — MEMORIZE THIS:
+-- "Find word starting with prefix in space-separated string":
+--
+--   WHERE col LIKE 'PREFIX%'        -- word at start
+--      OR col LIKE '% PREFIX%'      -- word after space
+--
+-- Real DE use cases:
+-- → Medical conditions search (this problem) ✅
+-- → Find tags in space-separated tag strings ✅
+-- → Search airline condition codes ✅
+-- → Find specific error codes in log strings ✅
+-- → Silver layer: validate condition code format ✅
+-- ============================================================
